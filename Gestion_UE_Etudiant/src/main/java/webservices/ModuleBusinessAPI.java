@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/module")
 public class ModuleBusinessAPI {
+
     ModuleBusiness helper = new ModuleBusiness();
     UniteEnseignementBusiness ueHelper = new UniteEnseignementBusiness();
 
@@ -24,6 +25,8 @@ public class ModuleBusinessAPI {
                 .entity(helper.getAllModules())
                 .build();
     }
+
+
     @Path("/new")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -37,6 +40,8 @@ public class ModuleBusinessAPI {
         }
         return Response.status(400).entity("didn't get added").build();
     }
+
+
     @Path("/search/{matricule}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -61,5 +66,35 @@ public class ModuleBusinessAPI {
         }
     }
 
-}
 
+    @Path("/ue/{code}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getModulesByUE(@PathParam("code") int code) {
+        UniteEnseignement ue = ueHelper.getUEByCode(code);
+        if (ue == null) {
+            return Response.status(404).entity("UE not found").build();
+        }
+        return Response.ok(helper.getModulesByUE(ue)).build();
+    }
+
+
+    @Path("/update/{matricule}")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response updateModule(@PathParam("matricule") String matricule, Module module) {
+        if (helper.updateModule(matricule, module)) {
+            return Response.status(200).entity("updated successfully").build();
+        }
+        return Response.status(404).entity("module not found").build();
+    }
+
+
+    @Path("/delete")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteModule(@QueryParam("matricule") String matricule) {
+        return Response.ok(helper.deleteModule(matricule)).build();
+    }
+}
