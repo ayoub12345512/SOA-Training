@@ -36,5 +36,30 @@ public class ModuleBusinessAPI {
             return Response.status(201).entity("added successfully").build();
         }
         return Response.status(400).entity("didn't get added").build();
-    }}
+    }
+    @Path("/search/{matricule}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchByMatricule(@PathParam("matricule") String matricule) {
+        Module m = helper.getModuleByMatricule(matricule);
+        if (m == null) {
+            return Response.status(404).entity("module not found").build();
+        }
+        return Response.ok(m).build();
+    }
+
+
+    @Path("")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchByType(@QueryParam("type") String type) {
+        try {
+            Module.TypeModule t = Module.TypeModule.valueOf(type.toUpperCase());
+            return Response.ok(helper.getModulesByType(t)).build();
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return Response.status(400).entity("type invalide").build();
+        }
+    }
+
+}
 
